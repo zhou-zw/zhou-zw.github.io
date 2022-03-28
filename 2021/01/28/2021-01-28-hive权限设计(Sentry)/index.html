@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.1.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css" integrity="sha256-jTIdiMuX/e3DGJUGwl3pKSxuc6YOuqtJYkM0bGQESA4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.10.1","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="1.Sentry是什么 Apache Sentry是Cloudera公司发布的一个Hadoop开源组件，它提供了细粒度级、基于角色的授权以及多租户的管理模式。 Sentry当前可以和Hive&#x2F;Hcatalog、Apache Solr 和Cloudera Impala集成， 为这些组件提供权限管理服务。 基于角色的管理（role-based acess control）通过创建角色，将每个">
+<meta property="og:type" content="article">
+<meta property="og:title" content="hive权限设计(Sentry)">
+<meta property="og:url" content="http://example.com/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/index.html">
+<meta property="og:site_name" content="zzw&#39;s blog">
+<meta property="og:description" content="1.Sentry是什么 Apache Sentry是Cloudera公司发布的一个Hadoop开源组件，它提供了细粒度级、基于角色的授权以及多租户的管理模式。 Sentry当前可以和Hive&#x2F;Hcatalog、Apache Solr 和Cloudera Impala集成， 为这些组件提供权限管理服务。 基于角色的管理（role-based acess control）通过创建角色，将每个">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/3.png">
+<meta property="og:image" content="http://example.com/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/4.png">
+<meta property="og:image" content="http://example.com/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/5.png">
+<meta property="og:image" content="http://example.com/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/6.png">
+<meta property="og:image" content="http://example.com/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/7.png">
+<meta property="og:image" content="http://example.com/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/8.png">
+<meta property="og:image" content="http://example.com/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/9.png">
+<meta property="og:image" content="http://example.com/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/10.png">
+<meta property="og:image" content="http://example.com/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/11.png">
+<meta property="og:image" content="http://example.com/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/12.png">
+<meta property="article:published_time" content="2021-01-27T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-03-28T01:46:07.889Z">
+<meta property="article:author" content="zzw">
+<meta property="article:tag" content="hive">
+<meta property="article:tag" content="sentry">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/3.png">
+
+
+<link rel="canonical" href="http://example.com/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/","path":"2021/01/28/2021-01-28-hive权限设计(Sentry)/","title":"hive权限设计(Sentry)"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>hive权限设计(Sentry) | zzw's blog</title>
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">zzw's blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="archive fa-fw"></i>归档</a></li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-Sentry%E6%98%AF%E4%BB%80%E4%B9%88"><span class="nav-number">1.</span> <span class="nav-text">1.Sentry是什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E8%A6%81%E6%B1%82"><span class="nav-number">2.</span> <span class="nav-text">2.要求</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E9%85%8D%E7%BD%AE"><span class="nav-number">3.</span> <span class="nav-text">3.配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-HDFS%E9%85%8D%E7%BD%AE"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 HDFS配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-Hive%E9%85%8D%E7%BD%AE"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 Hive配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-impala%E9%85%8D%E7%BD%AE"><span class="nav-number">3.3.</span> <span class="nav-text">3.3 impala配置</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-Sentry%E6%9D%83%E9%99%90%E5%88%86%E9%85%8D%E6%A8%A1%E5%BC%8F"><span class="nav-number">4.</span> <span class="nav-text">4.Sentry权限分配模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E5%9F%BA%E6%9C%AC%E7%94%A8%E6%B3%95"><span class="nav-number">5.</span> <span class="nav-text">5.基本用法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-%E5%AE%9E%E9%99%85%E4%BD%BF%E7%94%A8%E6%A0%B7%E4%BE%8B"><span class="nav-number">6.</span> <span class="nav-text">6.实际使用样例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#6-1-hive%E7%94%A8%E6%88%B7%E6%8E%88%E4%BA%88%E7%AE%A1%E7%90%86%E5%91%98%E6%9D%83%E9%99%90"><span class="nav-number">6.1.</span> <span class="nav-text">6.1 hive用户授予管理员权限</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#6-1-1-%E5%88%9B%E5%BB%BA%E7%AE%A1%E7%90%86%E5%91%98%E8%A7%92%E8%89%B2admin"><span class="nav-number">6.1.1.</span> <span class="nav-text">6.1.1 创建管理员角色admin</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-1-2-%E4%B8%BAadmin%E8%A7%92%E8%89%B2%E6%8E%88%E4%BA%88%E5%85%A8%E9%83%A8server%E6%9D%83%E9%99%90"><span class="nav-number">6.1.2.</span> <span class="nav-text">6.1.2 为admin角色授予全部server权限</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-1-3-%E4%B8%BAhive%E7%94%A8%E6%88%B7%E8%B5%8B%E4%BA%88admin%E8%A7%92%E8%89%B2"><span class="nav-number">6.1.3.</span> <span class="nav-text">6.1.3 为hive用户赋予admin角色</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-2-%E5%88%9B%E5%BB%BA%E5%8F%AA%E8%AF%BB%E6%9D%83%E9%99%90%E8%A7%92%E8%89%B2"><span class="nav-number">6.2.</span> <span class="nav-text">6.2 创建只读权限角色</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#6-2-1-linux%E5%88%9B%E5%BB%BAbigdata%E7%94%A8%E6%88%B7"><span class="nav-number">6.2.1.</span> <span class="nav-text">6.2.1 linux创建bigdata用户</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-2-2-hive%E5%88%9B%E5%BB%BA%E8%A7%92%E8%89%B2"><span class="nav-number">6.2.2.</span> <span class="nav-text">6.2.2 hive创建角色</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-2-3-%E5%88%86%E9%85%8D%E5%8F%AA%E8%AF%BB%E6%9D%83%E9%99%90%E7%BB%99%E8%A7%92%E8%89%B2"><span class="nav-number">6.2.3.</span> <span class="nav-text">6.2.3 分配只读权限给角色</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-2-4-%E5%B0%86%E8%A7%92%E8%89%B2%E5%88%86%E9%85%8D%E7%BB%99%E7%94%A8%E6%88%B7%E7%BB%84"><span class="nav-number">6.2.4.</span> <span class="nav-text">6.2.4 将角色分配给用户组</span></a></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="zzw"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">zzw</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">11</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+        <div class="back-to-top animated" role="button" aria-label="返回顶部">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zzw">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="zzw's blog">
+      <meta itemprop="description" content="">
+    </span>
+    
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="hive权限设计(Sentry) | zzw's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          hive权限设计(Sentry)
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-01-28 00:00:00" itemprop="dateCreated datePublished" datetime="2021-01-28T00:00:00+08:00">2021-01-28</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2022-03-28 09:46:07" itemprop="dateModified" datetime="2022-03-28T09:46:07+08:00">2022-03-28</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/hive/" itemprop="url" rel="index"><span itemprop="name">hive</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="1-Sentry是什么"><a href="#1-Sentry是什么" class="headerlink" title="1.Sentry是什么"></a>1.Sentry是什么</h2><ol>
+<li>Apache Sentry是Cloudera公司发布的一个Hadoop开源组件，它提供了细粒度级、基于角色的授权以及多租户的管理模式。</li>
+<li>Sentry当前可以和Hive&#x2F;Hcatalog、Apache Solr 和Cloudera Impala集成， 为这些组件提供权限管理服务。</li>
+<li>基于角色的管理（role-based acess control）通过创建角色，将每个组件的权限授予给此角色，然后在用户(组)中添加此角色，用户便具备此角色访问组件的权限。</li>
+<li>使用sentry对hive进行权限管理时，这里的组件可以是整个server，也可以是单个db,或者单张table。</li>
+</ol>
+<h2 id="2-要求"><a href="#2-要求" class="headerlink" title="2.要求"></a>2.要求</h2><p>使用beeline连接hive，进行权限管理，Hive Cli不支持Sentry管理。</p>
+<span id="more"></span>
+
+<h2 id="3-配置"><a href="#3-配置" class="headerlink" title="3.配置"></a>3.配置</h2><h3 id="3-1-HDFS配置"><a href="#3-1-HDFS配置" class="headerlink" title="3.1 HDFS配置"></a>3.1 HDFS配置</h3><p>HDFS访问控制列表开启</p>
+<p><img src="/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/3.png"></p>
+<p>检查HDFS权限开启</p>
+<p><img src="/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/4.png"></p>
+<p>Sentry开启</p>
+<p><img src="/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/5.png"></p>
+<h3 id="3-2-Hive配置"><a href="#3-2-Hive配置" class="headerlink" title="3.2 Hive配置"></a>3.2 Hive配置</h3><p>hive Sentry开启 </p>
+<p><img src="/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/6.png"></p>
+<p>Hive Impersonation禁用</p>
+<p><img src="/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/7.png"></p>
+<p>启用数据库中的存储通知hive Metastore Server Default Group</p>
+<p><img src="/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/8.png"></p>
+<p>Set sentry.hive.testing.mode&#x3D;true</p>
+<p><img src="/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/9.png"></p>
+<h3 id="3-3-impala配置"><a href="#3-3-impala配置" class="headerlink" title="3.3 impala配置"></a>3.3 impala配置</h3><p>Sentry开启</p>
+<p><img src="/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/10.png"></p>
+<h2 id="4-Sentry权限分配模式"><a href="#4-Sentry权限分配模式" class="headerlink" title="4.Sentry权限分配模式"></a>4.Sentry权限分配模式</h2><p><img src="/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/11.png"></p>
+<p>备注：权限赋予角色，角色分给用户组，之后该用户组下所有用户都将拥有该权限</p>
+<h2 id="5-基本用法"><a href="#5-基本用法" class="headerlink" title="5.基本用法"></a>5.基本用法</h2><p>将role从角色中剔除</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">REVOKE</span> ROLE role1 <span class="keyword">FROM</span> <span class="keyword">GROUP</span> user1;</span><br></pre></td></tr></table></figure>
+
+<p>删除role</p>
+<p>&#x2F;&#x2F;先查看角色列表</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">show</span> roles</span><br></pre></td></tr></table></figure>
+
+<p>&#x2F;&#x2F;删除角色</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">drop</span> role role2;</span><br></pre></td></tr></table></figure>
+
+<p>角色权限撤销</p>
+<p>&#x2F;&#x2F;先查看角色当前授权信息</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">show</span> <span class="keyword">grant</span> role role1;</span><br></pre></td></tr></table></figure>
+
+<p>&#x2F;&#x2F;将db1的操作权限从role1撤销</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">revoke</span> <span class="keyword">all</span> <span class="keyword">on</span> database db1 <span class="keyword">from</span> role role1;</span><br></pre></td></tr></table></figure>
+
+<p>授权语句说明：</p>
+<p>角色授权和撤销</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">GRANT</span> ROLE role_name [, role_name] <span class="keyword">TO</span> <span class="keyword">GROUP</span> <span class="operator">&lt;</span>groupName<span class="operator">&gt;</span> [,<span class="keyword">GROUP</span> <span class="operator">&lt;</span>groupName<span class="operator">&gt;</span>]</span><br><span class="line"></span><br><span class="line"><span class="keyword">REVOKE</span> ROLE role_name [, role_name] <span class="keyword">FROM</span> <span class="keyword">GROUP</span> <span class="operator">&lt;</span>groupName<span class="operator">&gt;</span> [,<span class="keyword">GROUP</span> <span class="operator">&lt;</span>groupName<span class="operator">&gt;</span>]</span><br></pre></td></tr></table></figure>
+
+<p>权限的授予和撤销</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">GRANT</span> <span class="operator">&lt;</span>PRIVILEGE<span class="operator">&gt;</span> [, <span class="operator">&lt;</span>PRIVILEGE<span class="operator">&gt;</span> ] <span class="keyword">ON</span> <span class="operator">&lt;</span>OBJECT<span class="operator">&gt;</span> <span class="operator">&lt;</span>object_name<span class="operator">&gt;</span> <span class="keyword">TO</span> ROLE <span class="operator">&lt;</span>roleName<span class="operator">&gt;</span> [,ROLE <span class="operator">&lt;</span>roleName<span class="operator">&gt;</span>]</span><br><span class="line"></span><br><span class="line"><span class="keyword">REVOKE</span> <span class="operator">&lt;</span>PRIVILEGE<span class="operator">&gt;</span> [, <span class="operator">&lt;</span>PRIVILEGE<span class="operator">&gt;</span> ] <span class="keyword">ON</span> <span class="operator">&lt;</span>OBJECT<span class="operator">&gt;</span> <span class="operator">&lt;</span>object_name<span class="operator">&gt;</span> <span class="keyword">FROM</span> ROLE <span class="operator">&lt;</span>roleName<span class="operator">&gt;</span> [,ROLE <span class="operator">&lt;</span>roleName<span class="operator">&gt;</span>]</span><br></pre></td></tr></table></figure>
+
+<p>查看角色&#x2F;组权限</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SHOW</span> ROLES;</span><br><span class="line"></span><br><span class="line"><span class="keyword">SHOW</span> <span class="keyword">CURRENT</span> ROLES;</span><br><span class="line"></span><br><span class="line"><span class="keyword">SHOW</span> ROLE <span class="keyword">GRANT</span> <span class="keyword">GROUP</span> <span class="operator">&lt;</span>groupName<span class="operator">&gt;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">SHOW</span> <span class="keyword">GRANT</span> ROLE <span class="operator">&lt;</span>roleName<span class="operator">&gt;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">SHOW</span> <span class="keyword">GRANT</span> ROLE <span class="operator">&lt;</span>roleName<span class="operator">&gt;</span> <span class="keyword">on</span> OBJECT <span class="operator">&lt;</span>objectName<span class="operator">&gt;</span>;</span><br></pre></td></tr></table></figure>
+
+<p>将某个数据库读权限授予给某个role</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">GRANT</span> <span class="keyword">SELECT</span> <span class="keyword">ON</span> DATABASE db_name <span class="keyword">TO</span> ROLE role_name;</span><br></pre></td></tr></table></figure>
+
+<p>将test 表的 S1 列的读权限授权给role_name （TABLE也可以不写）</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">GRANT</span> <span class="keyword">SELECT</span>(s1) <span class="keyword">ON</span> <span class="keyword">TABLE</span> test <span class="keyword">TO</span> ROLE role_name;</span><br></pre></td></tr></table></figure>
+
+<p>test表的select 权限给 role_name 角色</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">GRANT</span> <span class="keyword">SELECT</span> <span class="keyword">ON</span> <span class="keyword">TABLE</span> test <span class="keyword">TO</span> ROLE role_name;</span><br></pre></td></tr></table></figure>
+
+<h2 id="6-实际使用样例"><a href="#6-实际使用样例" class="headerlink" title="6.实际使用样例"></a>6.实际使用样例</h2><h3 id="6-1-hive用户授予管理员权限"><a href="#6-1-hive用户授予管理员权限" class="headerlink" title="6.1 hive用户授予管理员权限"></a>6.1 hive用户授予管理员权限</h3><h4 id="6-1-1-创建管理员角色admin"><a href="#6-1-1-创建管理员角色admin" class="headerlink" title="6.1.1 创建管理员角色admin"></a>6.1.1 创建管理员角色admin</h4><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> ROLE admin;</span><br></pre></td></tr></table></figure>
+
+<h4 id="6-1-2-为admin角色授予全部server权限"><a href="#6-1-2-为admin角色授予全部server权限" class="headerlink" title="6.1.2 为admin角色授予全部server权限"></a>6.1.2 为admin角色授予全部server权限</h4><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">grant</span> <span class="keyword">all</span> <span class="keyword">on</span> server server1 <span class="keyword">to</span> role admin;(server1为用于 Sentry 授权的服务器名称，默认为server1)</span><br></pre></td></tr></table></figure>
+
+<p><img src="/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/12.png"></p>
+<h4 id="6-1-3-为hive用户赋予admin角色"><a href="#6-1-3-为hive用户赋予admin角色" class="headerlink" title="6.1.3 为hive用户赋予admin角色"></a>6.1.3 为hive用户赋予admin角色</h4><p>&#x2F;&#x2F;经过这一步，hive用户已经可以作为管理员用户执行全部数据和权限操作。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">GRANT</span> ROLE admin <span class="keyword">TO</span> <span class="keyword">GROUP</span> hive;</span><br></pre></td></tr></table></figure>
+
+<h3 id="6-2-创建只读权限角色"><a href="#6-2-创建只读权限角色" class="headerlink" title="6.2 创建只读权限角色"></a>6.2 创建只读权限角色</h3><h4 id="6-2-1-linux创建bigdata用户"><a href="#6-2-1-linux创建bigdata用户" class="headerlink" title="6.2.1 linux创建bigdata用户"></a>6.2.1 linux创建bigdata用户</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">useradd hive</span><br><span class="line"></span><br><span class="line">passwd hive</span><br></pre></td></tr></table></figure>
+
+<h4 id="6-2-2-hive创建角色"><a href="#6-2-2-hive创建角色" class="headerlink" title="6.2.2 hive创建角色"></a>6.2.2 hive创建角色</h4><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">create</span> role hive_select;</span><br></pre></td></tr></table></figure>
+
+<h4 id="6-2-3-分配只读权限给角色"><a href="#6-2-3-分配只读权限给角色" class="headerlink" title="6.2.3 分配只读权限给角色"></a>6.2.3 分配只读权限给角色</h4><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">grant</span> <span class="keyword">select</span> <span class="keyword">on</span> database tmp <span class="keyword">to</span> role hive_select;</span><br></pre></td></tr></table></figure>
+
+<h4 id="6-2-4-将角色分配给用户组"><a href="#6-2-4-将角色分配给用户组" class="headerlink" title="6.2.4 将角色分配给用户组"></a>6.2.4 将角色分配给用户组</h4><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">grant</span> role hive_select <span class="keyword">to</span> <span class="keyword">group</span> bigdata;</span><br></pre></td></tr></table></figure>
+
+<p>这样，当使用bigdata用户登录hive时，对于库tmp只有select权限</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/hive/" rel="tag"># hive</a>
+              <a href="/tags/sentry/" rel="tag"># sentry</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2021/01/28/2021-01-28-sqoop%E6%8A%BD%E5%8F%96oracle%E6%95%B0%E6%8D%AE%E8%87%B3hive%E5%B9%B6%E5%BB%BA%E8%A1%A8/" rel="prev" title="sqoop抽取oracle数据至hive并建表">
+                  <i class="fa fa-chevron-left"></i> sqoop抽取oracle数据至hive并建表
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2021/01/29/2021-01-29-sentry%E5%90%AF%E5%8A%A8%E6%8A%A5%E9%94%99/" rel="next" title="sentry启动报错">
+                  sentry启动报错 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zzw</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

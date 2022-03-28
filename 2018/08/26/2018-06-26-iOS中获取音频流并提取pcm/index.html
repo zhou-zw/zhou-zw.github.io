@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.1.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css" integrity="sha256-jTIdiMuX/e3DGJUGwl3pKSxuc6YOuqtJYkM0bGQESA4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.10.1","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="最近工作中涉及采集手机麦克风的声音并且播放出来，我先后试了两种获取麦克风声音的方案： 1.此方案是通过AVCaptureSession获取的原始音频流，这个回调返回的音频数据123-(void)audioWithSampleBuffer:(CMSampleBufferRef)sampleBuffer &amp;#123; &amp;#125;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="iOS中获取音频流并提取pcm">
+<meta property="og:url" content="http://example.com/2018/08/26/2018-06-26-iOS%E4%B8%AD%E8%8E%B7%E5%8F%96%E9%9F%B3%E9%A2%91%E6%B5%81%E5%B9%B6%E6%8F%90%E5%8F%96pcm/index.html">
+<meta property="og:site_name" content="zzw&#39;s blog">
+<meta property="og:description" content="最近工作中涉及采集手机麦克风的声音并且播放出来，我先后试了两种获取麦克风声音的方案： 1.此方案是通过AVCaptureSession获取的原始音频流，这个回调返回的音频数据123-(void)audioWithSampleBuffer:(CMSampleBufferRef)sampleBuffer &amp;#123; &amp;#125;">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2018-08-25T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-03-28T01:44:30.819Z">
+<meta property="article:author" content="zzw">
+<meta property="article:tag" content="ios">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://example.com/2018/08/26/2018-06-26-iOS%E4%B8%AD%E8%8E%B7%E5%8F%96%E9%9F%B3%E9%A2%91%E6%B5%81%E5%B9%B6%E6%8F%90%E5%8F%96pcm/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2018/08/26/2018-06-26-iOS%E4%B8%AD%E8%8E%B7%E5%8F%96%E9%9F%B3%E9%A2%91%E6%B5%81%E5%B9%B6%E6%8F%90%E5%8F%96pcm/","path":"2018/08/26/2018-06-26-iOS中获取音频流并提取pcm/","title":"iOS中获取音频流并提取pcm"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>iOS中获取音频流并提取pcm | zzw's blog</title>
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">zzw's blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="archive fa-fw"></i>归档</a></li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E6%AD%A4%E6%96%B9%E6%A1%88%E6%98%AF%E9%80%9A%E8%BF%87AVCaptureSession%E8%8E%B7%E5%8F%96%E7%9A%84%E5%8E%9F%E5%A7%8B%E9%9F%B3%E9%A2%91%E6%B5%81%EF%BC%8C%E8%BF%99%E4%B8%AA%E5%9B%9E%E8%B0%83%E8%BF%94%E5%9B%9E%E7%9A%84%E9%9F%B3%E9%A2%91%E6%95%B0%E6%8D%AE"><span class="nav-number">1.</span> <span class="nav-text">1.此方案是通过AVCaptureSession获取的原始音频流，这个回调返回的音频数据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E8%BF%99%E4%B8%AA%E6%96%B9%E6%A1%88%E6%98%AF%E9%80%9A%E8%BF%87AudioUnit%E8%8E%B7%E5%8F%96%E7%9A%84%E5%8E%9F%E5%A7%8B%E9%9F%B3%E9%A2%91%E6%B5%81%EF%BC%8CAudioUnit%E4%B8%8D%E8%AF%A6%E7%BB%86%E4%BB%8B%E7%BB%8D%E4%BA%86%EF%BC%8C%E4%BB%A5%E4%B8%8B%E4%BB%8B%E7%BB%8D%E4%BB%8EAudioUnit%E8%8E%B7%E5%8F%96%E7%9A%84%E5%8E%9F%E5%A7%8B%E6%95%B0%E6%8D%AE%E4%B8%AD%E6%8F%90%E5%8F%96pcm%EF%BC%9A"><span class="nav-number">2.</span> <span class="nav-text">2.这个方案是通过AudioUnit获取的原始音频流，AudioUnit不详细介绍了，以下介绍从AudioUnit获取的原始数据中提取pcm：</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#github-demo%E5%9C%B0%E5%9D%80%EF%BC%9Ahttps-github-com-zhou-zw-KtvKit"><span class="nav-number">2.1.</span> <span class="nav-text">github demo地址：https:&#x2F;&#x2F;github.com&#x2F;zhou-zw&#x2F;KtvKit</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="zzw"
+      src="/images/avatar.gif">
+  <p class="site-author-name" itemprop="name">zzw</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">11</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+        <div class="back-to-top animated" role="button" aria-label="返回顶部">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2018/08/26/2018-06-26-iOS%E4%B8%AD%E8%8E%B7%E5%8F%96%E9%9F%B3%E9%A2%91%E6%B5%81%E5%B9%B6%E6%8F%90%E5%8F%96pcm/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zzw">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="zzw's blog">
+      <meta itemprop="description" content="">
+    </span>
+    
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="iOS中获取音频流并提取pcm | zzw's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          iOS中获取音频流并提取pcm
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2018-08-26 00:00:00" itemprop="dateCreated datePublished" datetime="2018-08-26T00:00:00+08:00">2018-08-26</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2022-03-28 09:44:30" itemprop="dateModified" datetime="2022-03-28T09:44:30+08:00">2022-03-28</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/iOS/" itemprop="url" rel="index"><span itemprop="name">iOS</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>最近工作中涉及采集手机麦克风的声音并且播放出来，我先后试了两种获取麦克风声音的方案：</p>
+<h3 id="1-此方案是通过AVCaptureSession获取的原始音频流，这个回调返回的音频数据"><a href="#1-此方案是通过AVCaptureSession获取的原始音频流，这个回调返回的音频数据" class="headerlink" title="1.此方案是通过AVCaptureSession获取的原始音频流，这个回调返回的音频数据"></a>1.此方案是通过<em>AVCaptureSession</em>获取的原始音频流，这个回调返回的音频数据</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">-(void)audioWithSampleBuffer:(CMSampleBufferRef)sampleBuffer &#123; </span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<span id="more"></span>
+
+<p>格式为CMSampleBufferRef，现在要从中提取pcm数据才能播放，方法如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">-(NSData *)convertAudioSamepleBufferToPcmData:(CMSampleBufferRef)sampleBuffer &#123;</span><br><span class="line"></span><br><span class="line">  //获取pcm数据大小</span><br><span class="line"></span><br><span class="line">  size_t size = CMSampleBufferGetTotalSampleSize(sampleBuffer);</span><br><span class="line"></span><br><span class="line">  //分配空间</span><br><span class="line"></span><br><span class="line">  int8_t *audio_data = (int8_t *)malloc(size); memset(audio_data, 0, size);</span><br><span class="line"></span><br><span class="line">  //获取CMBlockBuffer, 这里面保存了PCM数据</span><br><span class="line"></span><br><span class="line">  CMBlockBufferRef blockBuffer = CMSampleBufferGetDataBuffer(sampleBuffer);</span><br><span class="line"></span><br><span class="line">  //将数据copy到我们分配的空间中</span><br><span class="line"></span><br><span class="line">  CMBlockBufferCopyDataBytes(blockBuffer, 0, size, audio_data);</span><br><span class="line"></span><br><span class="line">  NSData *data = [NSData dataWithBytes:audio_data length:size];</span><br><span class="line"></span><br><span class="line">  free(audio_data);</span><br><span class="line"></span><br><span class="line">  return data;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>拿到这个data，就能直接播放了，此处参考了文章：<a target="_blank" rel="noopener" href="https://blog.csdn.net/baidu_32469997/article/details/70017321">https://blog.csdn.net/baidu_32469997/article/details/70017321</a></p>
+<h3 id="2-这个方案是通过AudioUnit获取的原始音频流，AudioUnit不详细介绍了，以下介绍从AudioUnit获取的原始数据中提取pcm："><a href="#2-这个方案是通过AudioUnit获取的原始音频流，AudioUnit不详细介绍了，以下介绍从AudioUnit获取的原始数据中提取pcm：" class="headerlink" title="2.这个方案是通过AudioUnit获取的原始音频流，AudioUnit不详细介绍了，以下介绍从AudioUnit获取的原始数据中提取pcm："></a>2.这个方案是通过AudioUnit获取的原始音频流，AudioUnit不详细介绍了，以下介绍从AudioUnit获取的原始数据中提取pcm：</h3><p>首先AudioUnit有个录音的回调：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line">static OSStatus recordingCallback(void *inRefCon,</span><br><span class="line"></span><br><span class="line">​                 AudioUnitRenderActionFlags *ioActionFlags,</span><br><span class="line"></span><br><span class="line">​                 const AudioTimeStamp *inTimeStamp,</span><br><span class="line"></span><br><span class="line">​                 UInt32 inBusNumber,</span><br><span class="line"></span><br><span class="line">​                 UInt32 inNumberFrames,</span><br><span class="line"></span><br><span class="line">​                 AudioBufferList *ioData) &#123;</span><br><span class="line"></span><br><span class="line">// Because of the way our audio format (setup below) is chosen:</span><br><span class="line"></span><br><span class="line">// we only need 1 buffer, since it is mono</span><br><span class="line"></span><br><span class="line">// Samples are 16 bits = 2 bytes.</span><br><span class="line"></span><br><span class="line">// 1 frame includes only 1 sample</span><br><span class="line"></span><br><span class="line">AudioBuffer buffer;</span><br><span class="line"></span><br><span class="line">buffer.mNumberChannels = 1;</span><br><span class="line"></span><br><span class="line">buffer.mDataByteSize = inNumberFrames * 2;</span><br><span class="line"></span><br><span class="line">buffer.mData = malloc( inNumberFrames * 2 );</span><br><span class="line"></span><br><span class="line">// Put buffer in a AudioBufferList</span><br><span class="line"></span><br><span class="line">AudioBufferList bufferList;</span><br><span class="line"></span><br><span class="line">bufferList.mNumberBuffers = 1;</span><br><span class="line"></span><br><span class="line">bufferList.mBuffers[0] = buffer;</span><br><span class="line"></span><br><span class="line">  // Then:</span><br><span class="line"></span><br><span class="line">  // Obtain recorded samples</span><br><span class="line"></span><br><span class="line">  OSStatus status;</span><br><span class="line"></span><br><span class="line">  status = AudioUnitRender([ystAudio audioUnit], ioActionFlags, inTimeStamp, inBusNumber, inNumberFrames, &amp;bufferList);</span><br><span class="line"></span><br><span class="line">checkStatus(status);</span><br><span class="line"></span><br><span class="line">  // Now, we have the samples we just read sitting in buffers in bufferList</span><br><span class="line"></span><br><span class="line">// Process the new data</span><br><span class="line"></span><br><span class="line">  [ystAudio processAudio:&amp;bufferList];</span><br><span class="line"></span><br><span class="line">// release the malloc&#x27;ed data in the buffer we created earlier</span><br><span class="line"></span><br><span class="line">free(bufferList.mBuffers[0].mData);</span><br><span class="line"></span><br><span class="line">  return noErr;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>拿到这个bufferList，然后开始转换：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">- (void) processAudio: (AudioBufferList*) bufferList&#123;</span><br><span class="line"></span><br><span class="line">AudioBuffer sourceBuffer = bufferList-&gt;mBuffers[0];</span><br><span class="line"></span><br><span class="line">// fix tempBuffer size if it&#x27;s the wrong size</span><br><span class="line"></span><br><span class="line">if (tempBuffer.mDataByteSize != sourceBuffer.mDataByteSize) &#123;</span><br><span class="line"></span><br><span class="line">free(tempBuffer.mData);</span><br><span class="line"></span><br><span class="line">tempBuffer.mDataByteSize = sourceBuffer.mDataByteSize;</span><br><span class="line"></span><br><span class="line">tempBuffer.mData = malloc(sourceBuffer.mDataByteSize);</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// copy incoming audio data to temporary buffer</span><br><span class="line"></span><br><span class="line">memcpy(tempBuffer.mData, bufferList-&gt;mBuffers[0].mData, bufferList-&gt;mBuffers[0].mDataByteSize);</span><br><span class="line"></span><br><span class="line">  NSData *data = [NSData dataWithBytes:sourceBuffer.mData length:bufferList-&gt;mBuffers[0].mDataByteSize];</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里的data拿到的就是pcm数据了</p>
+<h4 id="github-demo地址：https-github-com-zhou-zw-KtvKit"><a href="#github-demo地址：https-github-com-zhou-zw-KtvKit" class="headerlink" title="github demo地址：https://github.com/zhou-zw/KtvKit"></a>github demo地址：<a target="_blank" rel="noopener" href="https://github.com/zhou-zw/KtvKit">https://github.com/zhou-zw/KtvKit</a></h4>
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/ios/" rel="tag"># ios</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+            </div>
+            <div class="post-nav-item">
+                <a href="/2021/01/27/2021-01-27-sqoop%E6%8A%A5%E9%94%99%E4%BF%A1%E6%81%AF%E6%95%B4%E7%90%86/" rel="next" title="sqoop报错信息整理">
+                  sqoop报错信息整理 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zzw</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>
