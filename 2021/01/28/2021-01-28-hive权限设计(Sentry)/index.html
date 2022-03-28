@@ -6,51 +6,51 @@
 <meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.1.0">
 
 
-  <link rel="apple-touch-icon" sizes="180x180" href="/zhou-zw/zhou-zw.github.io/images/apple-touch-icon-next.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/zhou-zw/zhou-zw.github.io/images/favicon-32x32-next.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/zhou-zw/zhou-zw.github.io/images/favicon-16x16-next.png">
-  <link rel="mask-icon" href="/zhou-zw/zhou-zw.github.io/images/logo.svg" color="#222">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
 
-<link rel="stylesheet" href="/zhou-zw/zhou-zw.github.io/css/main.css">
+<link rel="stylesheet" href="/css/main.css">
 
 
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css" integrity="sha256-jTIdiMuX/e3DGJUGwl3pKSxuc6YOuqtJYkM0bGQESA4=" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
 
-<script class="next-config" data-name="main" type="application/json">{"hostname":"github.com","root":"/zhou-zw/zhou-zw.github.io/","images":"/zhou-zw/zhou-zw.github.io/images","scheme":"Muse","darkmode":false,"version":"8.10.1","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/zhou-zw/zhou-zw.github.io/js/config.js"></script>
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.10.1","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
 
     <meta name="description" content="1.Sentry是什么 Apache Sentry是Cloudera公司发布的一个Hadoop开源组件，它提供了细粒度级、基于角色的授权以及多租户的管理模式。 Sentry当前可以和Hive&#x2F;Hcatalog、Apache Solr 和Cloudera Impala集成， 为这些组件提供权限管理服务。 基于角色的管理（role-based acess control）通过创建角色，将每个">
 <meta property="og:type" content="article">
 <meta property="og:title" content="hive权限设计(Sentry)">
-<meta property="og:url" content="https://github.com/zhou-zw/zhou-zw.github.io/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/index.html">
+<meta property="og:url" content="http://example.com/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/index.html">
 <meta property="og:site_name" content="zzw&#39;s blog">
 <meta property="og:description" content="1.Sentry是什么 Apache Sentry是Cloudera公司发布的一个Hadoop开源组件，它提供了细粒度级、基于角色的授权以及多租户的管理模式。 Sentry当前可以和Hive&#x2F;Hcatalog、Apache Solr 和Cloudera Impala集成， 为这些组件提供权限管理服务。 基于角色的管理（role-based acess control）通过创建角色，将每个">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://github.com/zhou-zw/zhou-zw.github.io/zhou-zw/zhou-zw.github.io/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/zhou-zw.github.io/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/3.png">
-<meta property="og:image" content="https://github.com/zhou-zw/zhou-zw.github.io/zhou-zw/zhou-zw.github.io/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/zhou-zw.github.io/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/4.png">
-<meta property="og:image" content="https://github.com/zhou-zw/zhou-zw.github.io/zhou-zw/zhou-zw.github.io/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/zhou-zw.github.io/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/5.png">
-<meta property="og:image" content="https://github.com/zhou-zw/zhou-zw.github.io/zhou-zw/zhou-zw.github.io/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/zhou-zw.github.io/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/6.png">
-<meta property="og:image" content="https://github.com/zhou-zw/zhou-zw.github.io/zhou-zw/zhou-zw.github.io/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/zhou-zw.github.io/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/7.png">
-<meta property="og:image" content="https://github.com/zhou-zw/zhou-zw.github.io/zhou-zw/zhou-zw.github.io/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/zhou-zw.github.io/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/8.png">
-<meta property="og:image" content="https://github.com/zhou-zw/zhou-zw.github.io/zhou-zw/zhou-zw.github.io/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/zhou-zw.github.io/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/9.png">
-<meta property="og:image" content="https://github.com/zhou-zw/zhou-zw.github.io/zhou-zw/zhou-zw.github.io/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/zhou-zw.github.io/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/10.png">
-<meta property="og:image" content="https://github.com/zhou-zw/zhou-zw.github.io/zhou-zw/zhou-zw.github.io/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/zhou-zw.github.io/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/11.png">
-<meta property="og:image" content="https://github.com/zhou-zw/zhou-zw.github.io/zhou-zw/zhou-zw.github.io/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/zhou-zw.github.io/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/12.png">
+<meta property="og:image" content="http://example.com/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/3.png">
+<meta property="og:image" content="http://example.com/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/4.png">
+<meta property="og:image" content="http://example.com/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/5.png">
+<meta property="og:image" content="http://example.com/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/6.png">
+<meta property="og:image" content="http://example.com/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/7.png">
+<meta property="og:image" content="http://example.com/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/8.png">
+<meta property="og:image" content="http://example.com/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/9.png">
+<meta property="og:image" content="http://example.com/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/10.png">
+<meta property="og:image" content="http://example.com/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/11.png">
+<meta property="og:image" content="http://example.com/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/12.png">
 <meta property="article:published_time" content="2021-01-27T16:00:00.000Z">
 <meta property="article:modified_time" content="2022-03-28T01:46:07.889Z">
 <meta property="article:author" content="zzw">
 <meta property="article:tag" content="hive">
 <meta property="article:tag" content="sentry">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://github.com/zhou-zw/zhou-zw.github.io/zhou-zw/zhou-zw.github.io/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/zhou-zw.github.io/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/3.png">
+<meta name="twitter:image" content="http://example.com/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/3.png">
 
 
-<link rel="canonical" href="https://github.com/zhou-zw/zhou-zw.github.io/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/">
+<link rel="canonical" href="http://example.com/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://github.com/zhou-zw/zhou-zw.github.io/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/","path":"2021/01/28/2021-01-28-hive权限设计(Sentry)/","title":"hive权限设计(Sentry)"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/","path":"2021/01/28/2021-01-28-hive权限设计(Sentry)/","title":"hive权限设计(Sentry)"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
 <title>hive权限设计(Sentry) | zzw's blog</title>
@@ -61,7 +61,7 @@
 
 
   <noscript>
-    <link rel="stylesheet" href="/zhou-zw/zhou-zw.github.io/css/noscript.css">
+    <link rel="stylesheet" href="/css/noscript.css">
   </noscript>
 </head>
 
@@ -81,7 +81,7 @@
 
   <div class="site-meta">
 
-    <a href="/zhou-zw/zhou-zw.github.io/" class="brand" rel="start">
+    <a href="/" class="brand" rel="start">
       <i class="logo-line"></i>
       <p class="site-title">zzw's blog</p>
       <i class="logo-line"></i>
@@ -97,7 +97,7 @@
 
 
 <nav class="site-nav">
-  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/zhou-zw/zhou-zw.github.io/" rel="section"><i class="home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/zhou-zw/zhou-zw.github.io/about/" rel="section"><i class="user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/zhou-zw/zhou-zw.github.io/tags/" rel="section"><i class="tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/zhou-zw/zhou-zw.github.io/categories/" rel="section"><i class="th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/zhou-zw/zhou-zw.github.io/archives/" rel="section"><i class="archive fa-fw"></i>归档</a></li>
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="archive fa-fw"></i>归档</a></li>
   </ul>
 </nav>
 
@@ -135,25 +135,25 @@
         <div class="site-overview-wrap sidebar-panel">
           <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <img class="site-author-image" itemprop="image" alt="zzw"
-      src="/zhou-zw/zhou-zw.github.io/images/avatar.gif">
+      src="/images/avatar.gif">
   <p class="site-author-name" itemprop="name">zzw</p>
   <div class="site-description" itemprop="description"></div>
 </div>
 <div class="site-state-wrap site-overview-item animated">
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
-        <a href="/zhou-zw/zhou-zw.github.io/archives/">
+        <a href="/archives/">
           <span class="site-state-item-count">11</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
-          <a href="/zhou-zw/zhou-zw.github.io/categories/">
+          <a href="/categories/">
         <span class="site-state-item-count">6</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
-          <a href="/zhou-zw/zhou-zw.github.io/tags/">
+          <a href="/tags/">
         <span class="site-state-item-count">9</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
@@ -193,10 +193,10 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://github.com/zhou-zw/zhou-zw.github.io/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/zhou-zw/zhou-zw.github.io/images/avatar.gif">
+      <meta itemprop="image" content="/images/avatar.gif">
       <meta itemprop="name" content="zzw">
     </span>
 
@@ -237,7 +237,7 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/zhou-zw/zhou-zw.github.io/categories/hive/" itemprop="url" rel="index"><span itemprop="name">hive</span></a>
+          <a href="/categories/hive/" itemprop="url" rel="index"><span itemprop="name">hive</span></a>
         </span>
     </span>
 
@@ -261,22 +261,22 @@
 <span id="more"></span>
 
 <h2 id="3-配置"><a href="#3-配置" class="headerlink" title="3.配置"></a>3.配置</h2><h3 id="3-1-HDFS配置"><a href="#3-1-HDFS配置" class="headerlink" title="3.1 HDFS配置"></a>3.1 HDFS配置</h3><p>HDFS访问控制列表开启</p>
-<p><img src="/zhou-zw/zhou-zw.github.io/zhou-zw/zhou-zw.github.io/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/zhou-zw.github.io/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/3.png"></p>
+<p><img src="/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/3.png"></p>
 <p>检查HDFS权限开启</p>
-<p><img src="/zhou-zw/zhou-zw.github.io/zhou-zw/zhou-zw.github.io/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/zhou-zw.github.io/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/4.png"></p>
+<p><img src="/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/4.png"></p>
 <p>Sentry开启</p>
-<p><img src="/zhou-zw/zhou-zw.github.io/zhou-zw/zhou-zw.github.io/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/zhou-zw.github.io/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/5.png"></p>
+<p><img src="/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/5.png"></p>
 <h3 id="3-2-Hive配置"><a href="#3-2-Hive配置" class="headerlink" title="3.2 Hive配置"></a>3.2 Hive配置</h3><p>hive Sentry开启 </p>
-<p><img src="/zhou-zw/zhou-zw.github.io/zhou-zw/zhou-zw.github.io/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/zhou-zw.github.io/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/6.png"></p>
+<p><img src="/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/6.png"></p>
 <p>Hive Impersonation禁用</p>
-<p><img src="/zhou-zw/zhou-zw.github.io/zhou-zw/zhou-zw.github.io/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/zhou-zw.github.io/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/7.png"></p>
+<p><img src="/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/7.png"></p>
 <p>启用数据库中的存储通知hive Metastore Server Default Group</p>
-<p><img src="/zhou-zw/zhou-zw.github.io/zhou-zw/zhou-zw.github.io/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/zhou-zw.github.io/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/8.png"></p>
+<p><img src="/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/8.png"></p>
 <p>Set sentry.hive.testing.mode&#x3D;true</p>
-<p><img src="/zhou-zw/zhou-zw.github.io/zhou-zw/zhou-zw.github.io/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/zhou-zw.github.io/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/9.png"></p>
+<p><img src="/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/9.png"></p>
 <h3 id="3-3-impala配置"><a href="#3-3-impala配置" class="headerlink" title="3.3 impala配置"></a>3.3 impala配置</h3><p>Sentry开启</p>
-<p><img src="/zhou-zw/zhou-zw.github.io/zhou-zw/zhou-zw.github.io/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/zhou-zw.github.io/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/10.png"></p>
-<h2 id="4-Sentry权限分配模式"><a href="#4-Sentry权限分配模式" class="headerlink" title="4.Sentry权限分配模式"></a>4.Sentry权限分配模式</h2><p><img src="/zhou-zw/zhou-zw.github.io/zhou-zw/zhou-zw.github.io/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/zhou-zw.github.io/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/11.png"></p>
+<p><img src="/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/10.png"></p>
+<h2 id="4-Sentry权限分配模式"><a href="#4-Sentry权限分配模式" class="headerlink" title="4.Sentry权限分配模式"></a>4.Sentry权限分配模式</h2><p><img src="/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/11.png"></p>
 <p>备注：权限赋予角色，角色分给用户组，之后该用户组下所有用户都将拥有该权限</p>
 <h2 id="5-基本用法"><a href="#5-基本用法" class="headerlink" title="5.基本用法"></a>5.基本用法</h2><p>将role从角色中剔除</p>
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">REVOKE</span> ROLE role1 <span class="keyword">FROM</span> <span class="keyword">GROUP</span> user1;</span><br></pre></td></tr></table></figure>
@@ -318,7 +318,7 @@
 
 <h4 id="6-1-2-为admin角色授予全部server权限"><a href="#6-1-2-为admin角色授予全部server权限" class="headerlink" title="6.1.2 为admin角色授予全部server权限"></a>6.1.2 为admin角色授予全部server权限</h4><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">grant</span> <span class="keyword">all</span> <span class="keyword">on</span> server server1 <span class="keyword">to</span> role admin;(server1为用于 Sentry 授权的服务器名称，默认为server1)</span><br></pre></td></tr></table></figure>
 
-<p><img src="/zhou-zw/zhou-zw.github.io/zhou-zw/zhou-zw.github.io/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/zhou-zw.github.io/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/12.png"></p>
+<p><img src="/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/12.png"></p>
 <h4 id="6-1-3-为hive用户赋予admin角色"><a href="#6-1-3-为hive用户赋予admin角色" class="headerlink" title="6.1.3 为hive用户赋予admin角色"></a>6.1.3 为hive用户赋予admin角色</h4><p>&#x2F;&#x2F;经过这一步，hive用户已经可以作为管理员用户执行全部数据和权限操作。</p>
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">GRANT</span> ROLE admin <span class="keyword">TO</span> <span class="keyword">GROUP</span> hive;</span><br></pre></td></tr></table></figure>
 
@@ -340,20 +340,20 @@
 
     <footer class="post-footer">
           <div class="post-tags">
-              <a href="/zhou-zw/zhou-zw.github.io/tags/hive/" rel="tag"># hive</a>
-              <a href="/zhou-zw/zhou-zw.github.io/tags/sentry/" rel="tag"># sentry</a>
+              <a href="/tags/hive/" rel="tag"># hive</a>
+              <a href="/tags/sentry/" rel="tag"># sentry</a>
           </div>
 
         
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/zhou-zw/zhou-zw.github.io/2021/01/28/2021-01-28-sqoop%E6%8A%BD%E5%8F%96oracle%E6%95%B0%E6%8D%AE%E8%87%B3hive%E5%B9%B6%E5%BB%BA%E8%A1%A8/" rel="prev" title="sqoop抽取oracle数据至hive并建表">
+                <a href="/2021/01/28/2021-01-28-sqoop%E6%8A%BD%E5%8F%96oracle%E6%95%B0%E6%8D%AE%E8%87%B3hive%E5%B9%B6%E5%BB%BA%E8%A1%A8/" rel="prev" title="sqoop抽取oracle数据至hive并建表">
                   <i class="fa fa-chevron-left"></i> sqoop抽取oracle数据至hive并建表
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/zhou-zw/zhou-zw.github.io/2021/01/29/2021-01-29-sentry%E5%90%AF%E5%8A%A8%E6%8A%A5%E9%94%99/" rel="next" title="sentry启动报错">
+                <a href="/2021/01/29/2021-01-29-sentry%E5%90%AF%E5%8A%A8%E6%8A%A5%E9%94%99/" rel="next" title="sentry启动报错">
                   sentry启动报错 <i class="fa fa-chevron-right"></i>
                 </a>
             </div>
@@ -390,7 +390,7 @@
 
   
   <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
-<script src="/zhou-zw/zhou-zw.github.io/js/comments.js"></script><script src="/zhou-zw/zhou-zw.github.io/js/utils.js"></script><script src="/zhou-zw/zhou-zw.github.io/js/motion.js"></script><script src="/zhou-zw/zhou-zw.github.io/js/schemes/muse.js"></script><script src="/zhou-zw/zhou-zw.github.io/js/next-boot.js"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
 
   
 
