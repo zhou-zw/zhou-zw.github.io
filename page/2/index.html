@@ -125,7 +125,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">12</span>
+          <span class="site-state-item-count">13</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -136,7 +136,7 @@
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-count">11</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -165,6 +165,104 @@
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="zzw">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="zzw's blog">
+      <meta itemprop="description" content="">
+    </span>
+    
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | zzw's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/" class="post-title-link" itemprop="url">hive权限设计(Sentry)</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-01-28 00:00:00" itemprop="dateCreated datePublished" datetime="2021-01-28T00:00:00+08:00">2021-01-28</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2022-03-28 09:46:07" itemprop="dateModified" datetime="2022-03-28T09:46:07+08:00">2022-03-28</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/hive/" itemprop="url" rel="index"><span itemprop="name">hive</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h2 id="1-Sentry是什么"><a href="#1-Sentry是什么" class="headerlink" title="1.Sentry是什么"></a>1.Sentry是什么</h2><ol>
+<li>Apache Sentry是Cloudera公司发布的一个Hadoop开源组件，它提供了细粒度级、基于角色的授权以及多租户的管理模式。</li>
+<li>Sentry当前可以和Hive&#x2F;Hcatalog、Apache Solr 和Cloudera Impala集成， 为这些组件提供权限管理服务。</li>
+<li>基于角色的管理（role-based acess control）通过创建角色，将每个组件的权限授予给此角色，然后在用户(组)中添加此角色，用户便具备此角色访问组件的权限。</li>
+<li>使用sentry对hive进行权限管理时，这里的组件可以是整个server，也可以是单个db,或者单张table。</li>
+</ol>
+<h2 id="2-要求"><a href="#2-要求" class="headerlink" title="2.要求"></a>2.要求</h2><p>使用beeline连接hive，进行权限管理，Hive Cli不支持Sentry管理。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/01/28/2021-01-28-hive%E6%9D%83%E9%99%90%E8%AE%BE%E8%AE%A1(Sentry)/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
