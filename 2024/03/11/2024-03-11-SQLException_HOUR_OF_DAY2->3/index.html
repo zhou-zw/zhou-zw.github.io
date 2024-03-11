@@ -23,24 +23,24 @@
     <meta name="description" content="最近用 jdbc 查询 mysql 中的datetime 字段报如下错误：  最后发现是夏令时导致的">
 <meta property="og:type" content="article">
 <meta property="og:title" content="java.sql.SQLException&amp;#58; HOUR_OF_DAY&amp;#58; 2 -&gt; 3">
-<meta property="og:url" content="http://example.com/2024/03/11/2024-03-11-java.sql.SQLException%20HOUR_OF_DAY%202%20-%3E%203/index.html">
+<meta property="og:url" content="http://example.com/2024/03/11/2024-03-11-SQLException_HOUR_OF_DAY2-%3E3/index.html">
 <meta property="og:site_name" content="zzw&#39;s blog">
 <meta property="og:description" content="最近用 jdbc 查询 mysql 中的datetime 字段报如下错误：  最后发现是夏令时导致的">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/2024/03/11/2024-03-11-java.sql.SQLException%20HOUR_OF_DAY%202%20-%3E%203/1.png">
+<meta property="og:image" content="http://example.com/2024/03/11/2024-03-11-SQLException_HOUR_OF_DAY2-%3E3/1.png">
 <meta property="article:published_time" content="2024-03-10T16:00:00.000Z">
-<meta property="article:modified_time" content="2024-03-11T08:53:54.874Z">
+<meta property="article:modified_time" content="2024-03-11T09:02:03.166Z">
 <meta property="article:author" content="zzw">
 <meta property="article:tag" content="mysql">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://example.com/2024/03/11/2024-03-11-java.sql.SQLException%20HOUR_OF_DAY%202%20-%3E%203/1.png">
+<meta name="twitter:image" content="http://example.com/2024/03/11/2024-03-11-SQLException_HOUR_OF_DAY2-%3E3/1.png">
 
 
-<link rel="canonical" href="http://example.com/2024/03/11/2024-03-11-java.sql.SQLException%20HOUR_OF_DAY%202%20-%3E%203/">
+<link rel="canonical" href="http://example.com/2024/03/11/2024-03-11-SQLException_HOUR_OF_DAY2-%3E3/">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2024/03/11/2024-03-11-java.sql.SQLException%20HOUR_OF_DAY%202%20-%3E%203/","path":"2024/03/11/2024-03-11-java.sql.SQLException HOUR_OF_DAY 2 -> 3/","title":"java.sql.SQLException&#58; HOUR_OF_DAY&#58; 2 -> 3"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2024/03/11/2024-03-11-SQLException_HOUR_OF_DAY2-%3E3/","path":"2024/03/11/2024-03-11-SQLException_HOUR_OF_DAY2->3/","title":"java.sql.SQLException&#58; HOUR_OF_DAY&#58; 2 -> 3"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
 <title>java.sql.SQLException&#58; HOUR_OF_DAY&#58; 2 -> 3 | zzw's blog</title>
@@ -182,7 +182,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/03/11/2024-03-11-java.sql.SQLException%20HOUR_OF_DAY%202%20-%3E%203/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/03/11/2024-03-11-SQLException_HOUR_OF_DAY2-%3E3/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -212,7 +212,7 @@
       <span class="post-meta-item-text">发表于</span>
       
 
-      <time title="创建时间：2024-03-11 00:00:00 / 修改时间：16:53:54" itemprop="dateCreated datePublished" datetime="2024-03-11T00:00:00+08:00">2024-03-11</time>
+      <time title="创建时间：2024-03-11 00:00:00 / 修改时间：17:02:03" itemprop="dateCreated datePublished" datetime="2024-03-11T00:00:00+08:00">2024-03-11</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -242,13 +242,13 @@
     
     <div class="post-body" itemprop="articleBody">
         <p>最近用 jdbc 查询 mysql 中的datetime 字段报如下错误：</p>
-<p><img src="/2024/03/11/2024-03-11-java.sql.SQLException%20HOUR_OF_DAY%202%20-%3E%203/1.png"></p>
+<p><img src="/2024/03/11/2024-03-11-SQLException_HOUR_OF_DAY2-%3E3/1.png"></p>
 <p>最后发现是夏令时导致的</p>
 <span id="more"></span>
 
 <p>由于美国有夏令时，CST非夏令时对应 UTC-06:00，夏令时对应 UTC-05:00 。<br>美国的夏令时，从每年3月第2个星期天凌晨开始，到每年11月第1个星期天凌晨结束。<br>以2020年为例:<br>夏令时开始时间调整前：2020年03月08日星期日 02:00:00，时间向前拨一小时.<br>调整后：2020年03月08日星期日 03:00:00</p>
 <p>夏令时结束时间调整前：2020年11月01日星期日 02:00:00，时间往回拨一小时.<br>调整后：2020年11月01日星期日 01:00:00</p>
-<p>这意味这:CST没有2020-03-08 02:00:00<del>2020-03-08 03:00:00 这个区间的时间。会有两个 2020-11-01 01:00:00</del>2020-11-01 02:00:00区间的时间。</p>
+<p>这意味这:CST没有2020-03-08 02:00:00到2020-03-08 03:00:00 这个区间的时间。会有两个 2020-11-01 01:00:00到2020-11-01 02:00:00区间的时间。</p>
 <p>解决方法：</p>
 <p>1.mysql-connector-java.jar版本6.x、8.x降级为5.1.x</p>
 <p>2.jdbc 连接设置一下时区：&amp;serverTimezone&#x3D;Asia&#x2F;Shanghai</p>
